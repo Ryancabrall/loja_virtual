@@ -1,0 +1,17 @@
+{
+  "name": "api-cadastro",
+  "version": "1.0.0",
+  "description": "Sistema de cadastro de clientes, produtos e usuários",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
