@@ -2101,7 +2101,7 @@
                                 <input type="color" id="configCorSecundaria" value="#ff6b9d" style="width: 100%; height: 40px; cursor: pointer;">
                             </div>
                         </div>
-                        <div class="form-row">
+                        <div class="form-row">  
                             <div class="form-group">
                                 <label for="configCorFundo1">Cor Fundo 1:</label>
                                 <input type="color" id="configCorFundo1" value="#ff6b9d" style="width: 100%; height: 40px; cursor: pointer;">
@@ -2261,7 +2261,7 @@
 
         function mostrarContato() {
             const config = JSON.parse(localStorage.getItem('siteConfig')) || {};
-            const contatoInfo = config.contato || 'Telefone: (11) 99999-9999\nEmail: contato@lojavirtual.com\nEndereço: Rua Exemplo, 123 - Centro\nHorário: Seg-Sex 09:00-18:00';
+            const contatoInfo = config.contato || 'Telefone: (11) 99999-9999\nEmail: contato@lojavirtual.com\nEndereço:PR-090 - Centro\nHorário: Seg-Sex 09:00-18:00';
             alert(`📞 Informações de Contato\n\n${contatoInfo}`);
         }
 
