@@ -213,6 +213,23 @@ app.delete('/api/produtos/file/:id', verificarAdmin, (req, res) => {
     }
 });
 
+// GET - Download do arquivo produtos.json
+app.get('/api/produtos/file/download', (req, res) => {
+    try {
+        if (fs.existsSync(produtosFile)) {
+            const dados = fs.readFileSync(produtosFile, 'utf8');
+            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('Content-Disposition', 'attachment; filename=produtos.json');
+            res.status(200).send(dados);
+        } else {
+            res.status(200).send('[]');
+        }
+    } catch (error) {
+        console.error('Erro ao baixar arquivo produtos.json:', error);
+        res.status(500).json({ error: 'Erro ao baixar arquivo produtos.json' });
+    }
+});
+
 app.listen(port, '0.0.0.0', () => {
     console.log(`Servidor rodando em http://localhost:${port}`);
     console.log(`Servidor acessível externamente em http://SEU_IP:${port}`);
