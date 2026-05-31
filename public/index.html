@@ -2254,6 +2254,10 @@
                 <h2>🔒 Acesso Admin</h2>
                 <div style="max-width: 400px; margin: 0 auto; padding: 30px; background: #f9f9f9; border-radius: 15px; border: 2px solid #e0e0e0;">
                     <div class="form-group">
+                        <label for="adminUsername">Username:</label>
+                        <input type="text" id="adminUsername" placeholder="Digite o username" required>
+                    </div>
+                    <div class="form-group">
                         <label for="adminPassword">Senha Admin:</label>
                         <input type="password" id="adminPassword" placeholder="Digite a senha admin" required>
                     </div>
@@ -3238,6 +3242,10 @@
                         <strong>Nome:</strong> ${produto.nome} | 
                         <strong>Preço:</strong> R$ ${produto.preco.toFixed(2)} | 
                         <strong>Estoque:</strong> ${produto.estoque}
+                        <div style="margin-top: 10px; display: flex; gap: 10px;">
+                            <button onclick="editarProduto('${produto.id}')" style="padding: 5px 10px; background: #ffc107; border: none; border-radius: 5px; cursor: pointer; color: white;">Editar</button>
+                            <button onclick="excluirProduto('${produto.id}')" style="padding: 5px 10px; background: #dc3545; border: none; border-radius: 5px; cursor: pointer; color: white;">Excluir</button>
+                        </div>
                     `;
                     produtosList.appendChild(item);
                 });
@@ -3316,10 +3324,14 @@
                     const item = document.createElement('div');
                     item.className = 'list-item';
                     item.innerHTML = `
-                        <strong>ID:</strong> ${produto.id} | 
-                        <strong>Nome:</strong> ${produto.nome} | 
-                        <strong>Preço:</strong> R$ ${produto.preco.toFixed(2)} | 
+                        <strong>ID:</strong> ${produto.id} |
+                        <strong>Nome:</strong> ${produto.nome} |
+                        <strong>Preço:</strong> R$ ${produto.preco.toFixed(2)} |
                         <strong>Estoque:</strong> ${produto.estoque}
+                        <div style="margin-top: 10px; display: flex; gap: 10px;">
+                            <button onclick="editarProduto('${produto.id}')" style="padding: 5px 10px; background: #ffc107; border: none; border-radius: 5px; cursor: pointer; color: white;">Editar</button>
+                            <button onclick="excluirProduto('${produto.id}')" style="padding: 5px 10px; background: #dc3545; border: none; border-radius: 5px; cursor: pointer; color: white;">Excluir</button>
+                        </div>
                     `;
                     produtosList.appendChild(item);
                 } else {
@@ -3329,6 +3341,101 @@
             } catch (error) {
                 showMessage('Erro ao buscar produto', 'error');
                 console.error('Erro na busca:', error);
+            }
+        }
+
+        async function editarProduto(id) {
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+
+            if (!username || !password) {
+                showMessage('Por favor, faça login no admin primeiro', 'error');
+                return;
+            }
+
+            const novoNome = prompt('Novo nome do produto:');
+            if (!novoNome) return;
+
+            const novoPreco = prompt('Novo preço do produto:');
+            if (!novoPreco) return;
+
+            const novoEstoque = prompt('Novo estoque do produto:');
+            if (!novoEstoque) return;
+
+            try {
+                // Primeiro, buscar todos os produtos
+                const response = await fetch(`${API_BASE}/api/produtos/file`);
+                const produtos = await response.json();
+
+                // Encontrar e atualizar o produto
+                const produtoIndex = produtos.findIndex(p => p.id === id);
+                if (produtoIndex === -1) {
+                    showMessage('Produto não encontrado', 'error');
+                    return;
+                }
+
+                produtos[produtoIndex].nome = novoNome;
+                produtos[produtoIndex].preco = parseFloat(novoPreco);
+                produtos[produtoIndex].estoque = parseInt(novoEstoque);
+
+                // Enviar atualização com headers de autenticação
+                const updateResponse = await fetch(`${API_BASE}/api/produtos/file`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-username': username,
+                        'x-password': password
+                    },
+                    body: JSON.stringify(produtos)
+                });
+
+                const data = await updateResponse.json();
+
+                if (updateResponse.ok) {
+                    showMessage(data.mensagem, 'success');
+                    listarProdutos();
+                } else {
+                    showMessage(data.error || 'Erro ao editar produto', 'error');
+                }
+            } catch (error) {
+                showMessage('Erro de conexão com o servidor', 'error');
+                console.error('Erro ao editar:', error);
+            }
+        }
+
+        async function excluirProduto(id) {
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+
+            if (!username || !password) {
+                showMessage('Por favor, faça login no admin primeiro', 'error');
+                return;
+            }
+
+            if (!confirm('Tem certeza que deseja excluir este produto?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/produtos/file/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'x-username': username,
+                        'x-password': password
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage(data.mensagem, 'success');
+                    listarProdutos();
+                } else {
+                    showMessage(data.error || 'Erro ao excluir produto', 'error');
+                }
+            } catch (error) {
+                showMessage('Erro de conexão com o servidor', 'error');
+                console.error('Erro ao excluir:', error);
             }
         }
 
