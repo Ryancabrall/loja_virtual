@@ -1,10 +1,11 @@
-const express = require('express'); 
-const fs = require('fs'); 
-const path = require('path'); 
-const cors = require('cors'); 
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const cors = require('cors');
 
 const app = express();
 const port = process.env.PORT || 3000;
+
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -98,49 +99,6 @@ app.get("/produtos/:id", (req, res) => {
         return res.status(404).json({ error: 'Produto não encontrado' });
     }
     res.status(200).json(produto);
-});
-
-/*
-  CLIENTES ENDPOINTS (Mantidos)
-*/
-
-app.post('/clientes', (req, res) => {
-    const { cpf, nome, idade, endereco, bairro, contato } = req.body;
-    if (!cpf || !nome || !idade || !endereco || !bairro || !contato) {
-        return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
-    }
-
-    const clientes = lerClientes();
-    if (clientes.some(c => c.cpf === cpf)) {
-        return res.status(400).json({ error: 'CPF já cadastrado' });
-    }
-
-    const novoCliente = { cpf, nome, idade, endereco, bairro, contato };
-    clientes.push(novoCliente);
-    salvarClientes(clientes);
-    res.status(201).json({ mensagem: 'Cliente cadastrado com sucesso', cliente: novoCliente });
-});
-
-app.get("/clientes", (req, res) => {
-    const clientes = lerClientes();
-    res.status(200).json(clientes);
-});
-
-app.get("/clientes/ordenados", (req, res) => {
-    const clientes = lerClientes();
-    // Ordenar por nome
-    const clientesOrdenados = clientes.sort((a, b) => a.nome.localeCompare(b.nome));
-    res.status(200).json(clientesOrdenados);
-});
-
-app.get("/clientes/:cpf", (req, res) => {
-    const { cpf } = req.params;
-    const clientes = lerClientes();
-    const cliente = clientes.find(c => c.cpf === cpf);
-    if (!cliente) {
-        return res.status(404).json({ error: 'Cliente não encontrado' });
-    }
-    res.status(200).json(cliente);
 });
 
 app.listen(port, '0.0.0.0', () => {
